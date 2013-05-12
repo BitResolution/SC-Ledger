@@ -3,14 +3,19 @@ package com.bitresolution.ledger;
 import com.google.common.base.Objects;
 import org.joda.time.DateTime;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Report {
 
     private final DateTime periodOfReport;
     private final DateTime filingDate;
+    private final List<Entry> entries;
 
-    public Report(DateTime periodOfReport, DateTime filingDate) {
+    public Report(DateTime periodOfReport, DateTime filingDate, List<Entry> entries) {
         this.periodOfReport = periodOfReport;
         this.filingDate = filingDate;
+        this.entries = entries;
     }
 
     public DateTime getPeriodOfReport() {
@@ -21,9 +26,13 @@ public class Report {
         return filingDate;
     }
 
+    public List<Entry> getEntries() {
+        return entries;
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hashCode(periodOfReport, filingDate);
+        return Objects.hashCode(periodOfReport, filingDate, entries);
     }
 
     @Override
@@ -35,7 +44,9 @@ public class Report {
             return false;
         }
         final Report other = (Report) obj;
-        return Objects.equal(this.periodOfReport, other.periodOfReport) && Objects.equal(this.filingDate, other.filingDate);
+        return Objects.equal(this.periodOfReport, other.periodOfReport)
+                && Objects.equal(this.filingDate, other.filingDate)
+                && Objects.equal(this.entries, other.entries);
     }
 
     @Override
@@ -43,12 +54,18 @@ public class Report {
         return Objects.toStringHelper(this)
                 .add("periodOfReport", periodOfReport)
                 .add("filingDate", filingDate)
+                .add("entries", entries)
                 .toString();
     }
 
     public static class Builder {
         private DateTime periodOfReport;
         private DateTime filingDate;
+        private List<Entry> entries;
+
+        public Builder() {
+            this.entries = new ArrayList<Entry>();
+        }
 
         public Builder setPeriodOfReport(DateTime periodOfReport) {
             this.periodOfReport = periodOfReport;
@@ -60,9 +77,13 @@ public class Report {
             return this;
         }
 
+        public Builder addEntry(Entry entry) {
+            entries.add(entry);
+            return this;
+        }
+
         public Report build() {
-            return new Report(periodOfReport, filingDate);
+            return new Report(periodOfReport, filingDate, entries);
         }
     }
-
 }

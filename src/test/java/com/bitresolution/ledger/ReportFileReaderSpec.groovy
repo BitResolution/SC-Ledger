@@ -29,4 +29,27 @@ class ReportFileReaderSpec extends Specification {
         then:
         assert report.filingDate == new DateTime("20120515")
     }
+
+    def "should create report with entry"() {
+        given:
+        File source = new File(this.getClass().getResource("/single-entry-example.txt").toURI())
+        ReportFileReader reader = new ReportFileReader(source)
+
+        when:
+        Report report = reader.readReport()
+
+        then:
+        assert report.entries == [new Entry(
+                "AGILENT TECHNOLOGIES INC",
+                "COM",
+                "00846U101",
+                "455",
+                "10233",
+                "SH",
+                "SOLE",
+                "",
+                "10233",
+                "0",
+                "0")]
+    }
 }
