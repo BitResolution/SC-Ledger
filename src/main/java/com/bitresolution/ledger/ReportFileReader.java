@@ -12,6 +12,7 @@ public class ReportFileReader implements Readable {
     private static final Logger log = LoggerFactory.getLogger(ReportFileReader.class);
 
     private static final String PERIOD_OF_REPORT = "CONFORMED PERIOD OF REPORT:";
+    private static final String FILING_DATE = "FILED AS OF DATE:";
 
     private final BufferedReader reader;
     private final File source;
@@ -35,6 +36,12 @@ public class ReportFileReader implements Readable {
                 DateTime periodOfReport = new DateTime(value);
                 report.setPeriodOfReport(periodOfReport);
                 log.debug("Parsed 'period of report' {} from file '{}'", periodOfReport, source.getName());
+            }
+            else if(line.startsWith(FILING_DATE)) {
+                String value = line.substring(FILING_DATE.length()).trim();
+                DateTime filingDate = new DateTime(value);
+                report.setFilingDate(filingDate);
+                log.debug("Parsed 'filing date' {} from file '{}'", filingDate, source.getName());
             }
             else {
                 log.trace("Skipping line: " + line);
