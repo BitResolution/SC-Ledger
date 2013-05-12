@@ -1,0 +1,11 @@
+CONFORMED PERIOD OF REPORT:	20120331	
+FILED AS OF DATE:		20120515
+                                                         MARKET    SHRS OR  SH/ PUT/ INVESTMENT  OTHER     VOTING AUTHORITY		
+NAME OF ISSUER               TITLE OF CLASS   CUSIP      VALUE     PRN AMT  PRN CALL DESCRETION  MANAGERS  SOLE        SHARED  NONE		
+<S>                          <C>              <C>        <C>       <C>      <C>      <C>                   <C>         <C>     <C>		
+AGILENT TECHNOLOGIES INC     COM              00846U101   455       10233    SH         SOLE               10233       0        0		
+
+</TABLE>		
+</TEXT>		
+</DOCUMENT>		
+</SEC-DOCUMENT>		
