@@ -1,6 +1,7 @@
 package com.bitresolution.ledger;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -67,14 +68,26 @@ public class Report {
             this.entries = new ArrayList<Entry>();
         }
 
+        public DateTime getPeriodOfReport() {
+            return periodOfReport;
+        }
+
         public Builder setPeriodOfReport(DateTime periodOfReport) {
             this.periodOfReport = periodOfReport;
             return this;
         }
 
+        public DateTime getFilingDate() {
+            return filingDate;
+        }
+
         public Builder setFilingDate(DateTime filingDate) {
             this.filingDate = filingDate;
             return this;
+        }
+
+        public List<Entry> getEntries() {
+            return ImmutableList.copyOf(entries);
         }
 
         public Builder addEntry(Entry entry) {

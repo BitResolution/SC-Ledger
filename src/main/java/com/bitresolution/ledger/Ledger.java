@@ -36,6 +36,12 @@ class Ledger {
         }
     }
 
+    public void loadReports(File... reportFiles) {
+        for(File reportFile : reportFiles) {
+            loadReport(reportFile);
+        }
+    }
+
     public int getNumberOfReports() {
         return reports.size();
     }
