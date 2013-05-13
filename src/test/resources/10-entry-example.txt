@@ -1,0 +1,20 @@
+CONFORMED PERIOD OF REPORT:	20120331	
+FILED AS OF DATE:		20120515
+                                                         MARKET    SHRS OR  SH/ PUT/ INVESTMENT  OTHER     VOTING AUTHORITY		
+NAME OF ISSUER               TITLE OF CLASS   CUSIP      VALUE     PRN AMT  PRN CALL DESCRETION  MANAGERS  SOLE        SHARED  NONE		
+<S>                          <C>              <C>        <C>       <C>      <C>      <C>                   <C>         <C>     <C>		
+AGILENT TECHNOLOGIES INC     COM              00846U101   455       10233    SH         SOLE               10233       0        0
+ALCOA INC                    COM              013817101   322       32098    SH         SOLE               32098       0        0
+AARONS INC                   COM PAR $0.50    002535300   636       24544    SH         SOLE               24544       0        0
+ADVANCE AUTO PARTS INC       COM              00751Y106   895       10105    SH         SOLE               10105       0        0
+APPLE INC                    COM              037833100   887        1480    SH         SOLE                1480       0        0
+ARBOR RLTY TR INC            COM              038923108    76       13600    SH         SOLE               13600       0        0
+ABBOTT LABS                  COM              002824100   847       13820    SH         SOLE               13820       0        0
+ARCTIC CAT INC               COM              039670104   231        5400    SH         SOLE                5400       0        0
+ACE LTD                      SHS              H0023R105   959       13099    SH         SOLE               13099       0        0
+ARCH CAP GROUP LTD           ORD              G0450A105   214        5759    SH         SOLE                5759       0        0
+
+</TABLE>		
+</TEXT>		
+</DOCUMENT>		
+</SEC-DOCUMENT>		

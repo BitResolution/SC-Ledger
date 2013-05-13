@@ -52,4 +52,16 @@ class ReportFileReaderSpec extends Specification {
                 "0",
                 "0")]
     }
+
+    def "should create report with multiple entries"() {
+        given:
+        File source = new File(this.getClass().getResource("/10-entry-example.txt").toURI())
+        ReportFileReader reader = new ReportFileReader(source)
+
+        when:
+        Report report = reader.readReport()
+
+        then:
+        assert report.entries.size() == 10
+    }
 }
