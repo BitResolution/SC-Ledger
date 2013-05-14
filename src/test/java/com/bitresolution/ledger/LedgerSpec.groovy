@@ -66,7 +66,39 @@ class LedgerSpec extends Specification {
     def "should summarise COM stock portfolio"() {
         given:
         Ledger ledger = new Ledger()
-        ledger.addReport(new Report(
+        ledger.addReport(buildExampleData())
+
+        when:
+        def result = ledger.summariseStock("COM", new DateTime("20120331"))
+
+        then:
+        assert result == 4349.0
+    }
+
+    def "should list top 5 performers for a given date"() {
+        given:
+        Ledger ledger = new Ledger()
+        ledger.addReport(buildExampleData())
+
+        when:
+        def result = ledger.findTopPerformersForDate(5, new DateTime("20120812"))
+
+        then:
+        assert result*.nameOfIssuer == [
+                "ARCH CAP GROUP LTD",
+                "ARCTIC CAT INC",
+                "ALCOA INC",
+                "AGILENT TECHNOLOGIES INC",
+                "AARONS INC"
+        ]
+    }
+
+    def "should list top 3 new positions for a given date"() {
+
+    }
+
+    private Report buildExampleData() {
+        return new Report(
                 new DateTime("20120331-01-01T00:00:00.000Z"),
                 new DateTime("20120515-01-01T00:00:00.000Z"),
                 Lists.newArrayList(
@@ -81,14 +113,8 @@ class LedgerSpec extends Specification {
                         new Entry("ACE LTD", "SHS", "H0023R105", "959", "13099", "SH", "SOLE", "", "13099", "0", "0"),
                         new Entry("ARCH CAP GROUP LTD", "ORD", "G0450A105", "214", "5759", "SH", "SOLE", "", "5759", "0", "0")
                 )
-        ))
-
-        when:
-        def result = ledger.summariseStock("COM", new DateTime("20120331"))
-
-        then:
-        assert result == 4349.0
+        )
     }
-
-
 }
+
+

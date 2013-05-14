@@ -110,4 +110,63 @@ class Ledger {
                 .add("reports", reports)
                 .toString();
     }
+
+    public List findTopPerformersForDate(int topPerformerCount, DateTime cutoff) {
+        BoundedSortedList<Entry> entries = new BoundedSortedList<Entry>(5, new Comparator<Entry>() {
+            @Override
+            public int compare(Entry entry, Entry entry2) {
+                return entry.getMarketValue().compareTo(entry2.getMarketValue());
+            }
+        });
+        for(Report report : reports) {
+            if(report.getPeriodOfReport().isBefore(cutoff)) {
+                for(Entry entry : report.getEntries()) {
+                    entries.add(entry);
+                }
+            }
+        }
+        return entries;
+    }
+
+    private static class BoundedSortedList<E> extends AbstractList<E> {
+
+        private final List<E> backingList;
+        private final Comparator<E> comparator;
+        private final int maxSize;
+
+        private BoundedSortedList(int maxSize, Comparator<E> comparator) {
+            this.comparator = comparator;
+            this.maxSize = maxSize;
+            backingList = new ArrayList<E>();
+        }
+
+        @Override
+        public E get(int i) {
+            return backingList.get(i);
+        }
+
+        public boolean add(E e) {
+            boolean added = backingList.add(e);
+            Collections.sort(backingList, comparator);
+            if(backingList.size() > maxSize) {
+                backingList.remove(maxSize);
+            }
+            return added;
+        }
+
+        @Override
+        public int size() {
+            return backingList.size();
+        }
+
+        @Override
+        public int hashCode() {
+            return backingList.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return backingList.equals(obj);
+        }
+    }
 }
