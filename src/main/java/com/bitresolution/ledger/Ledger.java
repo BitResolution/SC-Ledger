@@ -6,6 +6,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,17 +112,37 @@ class Ledger {
                 .toString();
     }
 
-    public List findTopPerformersForDate(int topPerformerCount, DateTime cutoff) {
-        BoundedSortedList<Entry> entries = new BoundedSortedList<Entry>(5, new Comparator<Entry>() {
-            @Override
-            public int compare(Entry entry, Entry entry2) {
-                return entry.getMarketValue().compareTo(entry2.getMarketValue());
-            }
-        });
+    public List<Entry> findTopPerformersForDate(int topPerformerCount, DateTime cutoff) {
+        BoundedSortedList<Entry> entries = new BoundedSortedList<Entry>(5, new EntryMarketValueComparator());
         for(Report report : reports) {
             if(report.getPeriodOfReport().isBefore(cutoff)) {
                 for(Entry entry : report.getEntries()) {
                     entries.add(entry);
+                }
+            }
+        }
+        return entries;
+    }
+
+    public List<Entry> findTopNewPerformersForDate(int topNewPerformerCount, DateTime cuttoff) {
+        ArrayList<Report> copy = Lists.newArrayList(reports);
+        Collections.sort(copy, new Comparator<Report>() {
+            @Override
+            public int compare(Report report, Report report2) {
+                return report.getPeriodOfReport().compareTo(report2.getPeriodOfReport());
+            }
+        });
+
+        Report current = copy.get(0);
+        Report previous = copy.get(1);
+
+        BoundedSortedList<Entry> entries = new BoundedSortedList<Entry>(5, new EntryMarketValueComparator());
+        for(Report report : reports) {
+            if(report.getPeriodOfReport().isBefore(cuttoff)) {
+                for(Entry entry : report.getEntries()) {
+                    if(!previous.containsEntryWithNameOfIssuer(entry.getNameOfIssuer())) {
+                        entries.add(entry);
+                    }
                 }
             }
         }
@@ -167,6 +188,13 @@ class Ledger {
         @Override
         public boolean equals(Object obj) {
             return backingList.equals(obj);
+        }
+    }
+
+    private static class EntryMarketValueComparator implements Comparator<Entry> {
+        @Override
+        public int compare(Entry entry, Entry entry2) {
+            return entry.getMarketValue().compareTo(entry2.getMarketValue());
         }
     }
 }

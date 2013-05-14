@@ -66,7 +66,7 @@ class LedgerSpec extends Specification {
     def "should summarise COM stock portfolio"() {
         given:
         Ledger ledger = new Ledger()
-        ledger.addReport(buildExampleData())
+        ledger.addReport(exampleDataSetA)
 
         when:
         def result = ledger.summariseStock("COM", new DateTime("20120331"))
@@ -78,7 +78,7 @@ class LedgerSpec extends Specification {
     def "should list top 5 performers for a given date"() {
         given:
         Ledger ledger = new Ledger()
-        ledger.addReport(buildExampleData())
+        ledger.addReport(exampleDataSetA)
 
         when:
         def result = ledger.findTopPerformersForDate(5, new DateTime("20120812"))
@@ -94,10 +94,25 @@ class LedgerSpec extends Specification {
     }
 
     def "should list top 3 new positions for a given date"() {
+        given:
+        Ledger ledger = new Ledger()
+        ledger.addReport(exampleDataSetA)
+        ledger.addReport(exampleDataSetB)
 
+        when:
+        def result = ledger.findTopNewPerformersForDate(3, new DateTime("20120812"))
+
+        then:
+        assert result*.nameOfIssuer == [
+                "ARCH CAP GROUP LTD",
+                "ARCTIC CAT INC",
+                "ALCOA INC",
+                "AGILENT TECHNOLOGIES INC",
+                "AARONS INC"
+        ]
     }
 
-    private Report buildExampleData() {
+    private static Report getExampleDataSetA() {
         return new Report(
                 new DateTime("20120331-01-01T00:00:00.000Z"),
                 new DateTime("20120515-01-01T00:00:00.000Z"),
@@ -111,6 +126,19 @@ class LedgerSpec extends Specification {
                         new Entry("ABBOTT LABS", "COM", "002824100", "847", "13820", "SH", "SOLE", "", "13820", "0", "0"),
                         new Entry("ARCTIC CAT INC", "COM", "039670104", "231", "5400", "SH", "SOLE", "", "5400", "0", "0"),
                         new Entry("ACE LTD", "SHS", "H0023R105", "959", "13099", "SH", "SOLE", "", "13099", "0", "0"),
+                        new Entry("ARCH CAP GROUP LTD", "ORD", "G0450A105", "214", "5759", "SH", "SOLE", "", "5759", "0", "0")
+                )
+        )
+    }
+
+    private static Report getExampleDataSetB() {
+        return new Report(
+                new DateTime("20120930-01-01T00:00:00.000Z"),
+                new DateTime("20121109-01-01T00:00:00.000Z"),
+                Lists.newArrayList(
+                        new Entry("ABBOTT LABS", "COM", "002824100", "47", "13820", "SH", "SOLE", "", "13820", "0", "0"),
+                        new Entry("ARCTIC CAT INC", "COM", "039670104", "1231", "5400", "SH", "SOLE", "", "5400", "0", "0"),
+                        new Entry("ACE LTD", "SHS", "H0023R105", "959", "13499", "SH", "SOLE", "", "13099", "0", "0"),
                         new Entry("ARCH CAP GROUP LTD", "ORD", "G0450A105", "214", "5759", "SH", "SOLE", "", "5759", "0", "0")
                 )
         )

@@ -1,9 +1,12 @@
 package com.bitresolution.ledger;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +60,15 @@ public class Report {
                 .add("filingDate", filingDate)
                 .add("entries", entries)
                 .toString();
+    }
+
+    public boolean containsEntryWithNameOfIssuer(final String issuer) {
+        return Iterables.contains(entries, new Predicate<Entry>() {
+            @Override
+            public boolean apply(@Nullable Entry entry) {
+                return entry.getNameOfIssuer().equals(issuer);
+            }
+        });
     }
 
     public static class Builder {
