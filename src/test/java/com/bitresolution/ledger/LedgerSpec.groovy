@@ -84,17 +84,11 @@ class LedgerSpec extends Specification {
         ))
 
         when:
-        def result = ledger.summariseStock("COM")
+        def result = ledger.summariseStock("COM", new DateTime("20120331"))
 
         then:
-        assert result
+        assert result == 4349.0
     }
 
-    def "should list top 5 performers for a given date"() {
 
-    }
-
-    def "should list top 3 new positions for a given date"() {
-
-    }
 }
