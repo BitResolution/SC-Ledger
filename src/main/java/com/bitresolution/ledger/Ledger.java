@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 class Ledger {
@@ -26,7 +27,7 @@ class Ledger {
         try {
             ReportFileReader reader = new ReportFileReader(reportFile);
             Report report = reader.readReport();
-            reports.add(report);
+            addReport(report);
         }
         catch (FileNotFoundException e) {
             log.error("Could not find report file: {}", reportFile);
@@ -34,6 +35,10 @@ class Ledger {
         catch (IOException e) {
             log.error("Failed to parse report file: {}", reportFile, e);
         }
+    }
+
+    public void addReport(Report report) {
+        reports.add(report);
     }
 
     public void loadReports(File... reportFiles) {
@@ -73,8 +78,8 @@ class Ledger {
                 .add("reports", reports)
                 .toString();
     }
-}
 
-/**
- *
- */
+    public List getSummariseStock() {
+        return null;
+    }
+}
