@@ -103,6 +103,7 @@ class LedgerSpec extends Specification {
         def result = ledger.findTopNewPerformersForDate(3, new DateTime("20120812"))
 
         then:
+        assert result.size() == 3
         assert result*.nameOfIssuer == [
                 "ARCH CAP GROUP LTD",
                 "ARCTIC CAT INC",
