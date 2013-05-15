@@ -20,6 +20,7 @@ import java.util.*;
 class Ledger {
 
     private static final Logger log = LoggerFactory.getLogger(Ledger.class);
+    private static final EntryMarketValueComparator MARKET_VALUE_COMPARATOR = new EntryMarketValueComparator();
 
     private final Set<Report> reports;
 
@@ -59,34 +60,74 @@ class Ledger {
         return ImmutableSet.copyOf(reports);
     }
 
-    public float summariseStock(final String stockName, final DateTime period) {
-        log.debug("Summarising stock '{}' for period '{}'", stockName, period);
+    public List<Float> summariseStock(final String stockName) {
+        log.debug("Summarising stock '{}' for period '{}'", stockName);
+        ArrayList<Float> results = new ArrayList<Float>();
         for(Report report : reports) {
-            if(report.getPeriodOfReport().equals(period)) {
-                log.debug("found report for period '{}'", period);
-                Iterable<Entry> filteredEntry = Iterables.filter(report.getEntries(), new Predicate<Entry>() {
-                    @Override
-                    public boolean apply(@Nullable Entry entry) {
-                        return entry.getTitleOfClass().contains(stockName);
-                    }
-                });
-                Iterable<Float> values = Iterables.transform(filteredEntry, new Function<Entry, Float>() {
-                    @Nullable
-                    @Override
-                    public Float apply(@Nullable Entry entry) {
-                        return Float.parseFloat(entry.getMarketValue());
-                    }
-                });
-                float result = 0;
-                for(Float value : values) {
-                    result += value;
+            log.debug("found report for period '{}'", report.getPeriodOfReport());
+            Iterable<Entry> filteredEntry = Iterables.filter(report.getEntries(), new Predicate<Entry>() {
+                @Override
+                public boolean apply(@Nullable Entry entry) {
+                    return entry.getTitleOfClass().contains(stockName);
                 }
-                return result;
+            });
+            log.trace("found {} stocks from issuer '{}'", Iterables.size(filteredEntry), stockName);
+            Iterable<Float> values = Iterables.transform(filteredEntry, new Function<Entry, Float>() {
+                @Nullable
+                @Override
+                public Float apply(@Nullable Entry entry) {
+                    return Float.parseFloat(entry.getMarketValue());
+                }
+            });
+            float result = 0;
+            for(Float value : values) {
+                result += value;
+            }
+            log.debug("report {} stocks from issuer '{}' value is {}", new Object[]{report.getPeriodOfReport(), stockName, result});
+            results.add(result);
+        }
+        log.debug("finished summarising stock {}: {}", stockName, results);
+        return results;
+    }
+
+    public List<Entry> findLargestPositions(int topPerformerCount, DateTime cutoff) {
+        BoundedSortedList<Entry> entries = new BoundedSortedList<Entry>(topPerformerCount, MARKET_VALUE_COMPARATOR);
+        for(Report report : reports) {
+            if(report.getPeriodOfReport().isBefore(cutoff)) {
+                for(Entry entry : report.getEntries()) {
+                    entries.add(entry);
+                }
             }
         }
-
-        return -1;
+        return entries;
     }
+
+    public List<Entry> findTopNewPerformers(int topNewPerformerCount, DateTime cuttoff) {
+        ArrayList<Report> copy = Lists.newArrayList(reports);
+        Collections.sort(copy, new Comparator<Report>() {
+            @Override
+            public int compare(Report report, Report report2) {
+                return report.getPeriodOfReport().compareTo(report2.getPeriodOfReport());
+            }
+        });
+
+        BoundedSortedList<Entry> entries = new BoundedSortedList<Entry>(topNewPerformerCount, MARKET_VALUE_COMPARATOR);
+        Iterator<Report> iterator = reports.iterator();
+        while(iterator.hasNext()) {
+            Report report = iterator.next();
+            if(report.getPeriodOfReport().isBefore(cuttoff)) {
+                Report previous = iterator.next();
+                for(Entry entry : report.getEntries()) {
+                    if(previous != null && !previous.containsEntryWithNameOfIssuer(entry.getNameOfIssuer())) {
+                        entries.add(entry);
+                    }
+                }
+                break;
+            }
+        }
+        return entries;
+    }
+
 
     @Override
     public int hashCode() {
@@ -110,91 +151,5 @@ class Ledger {
         return Objects.toStringHelper(this)
                 .add("reports", reports)
                 .toString();
-    }
-
-    public List<Entry> findTopPerformersForDate(int topPerformerCount, DateTime cutoff) {
-        BoundedSortedList<Entry> entries = new BoundedSortedList<Entry>(5, new EntryMarketValueComparator());
-        for(Report report : reports) {
-            if(report.getPeriodOfReport().isBefore(cutoff)) {
-                for(Entry entry : report.getEntries()) {
-                    entries.add(entry);
-                }
-            }
-        }
-        return entries;
-    }
-
-    public List<Entry> findTopNewPerformersForDate(int topNewPerformerCount, DateTime cuttoff) {
-        ArrayList<Report> copy = Lists.newArrayList(reports);
-        Collections.sort(copy, new Comparator<Report>() {
-            @Override
-            public int compare(Report report, Report report2) {
-                return report.getPeriodOfReport().compareTo(report2.getPeriodOfReport());
-            }
-        });
-
-        Report current = copy.get(0);
-        Report previous = copy.get(1);
-
-        BoundedSortedList<Entry> entries = new BoundedSortedList<Entry>(5, new EntryMarketValueComparator());
-        for(Report report : reports) {
-            if(report.getPeriodOfReport().isBefore(cuttoff)) {
-                for(Entry entry : report.getEntries()) {
-                    if(!previous.containsEntryWithNameOfIssuer(entry.getNameOfIssuer())) {
-                        entries.add(entry);
-                    }
-                }
-            }
-        }
-        return entries;
-    }
-
-    private static class BoundedSortedList<E> extends AbstractList<E> {
-
-        private final List<E> backingList;
-        private final Comparator<E> comparator;
-        private final int maxSize;
-
-        private BoundedSortedList(int maxSize, Comparator<E> comparator) {
-            this.comparator = comparator;
-            this.maxSize = maxSize;
-            backingList = new ArrayList<E>();
-        }
-
-        @Override
-        public E get(int i) {
-            return backingList.get(i);
-        }
-
-        public boolean add(E e) {
-            boolean added = backingList.add(e);
-            Collections.sort(backingList, comparator);
-            if(backingList.size() > maxSize) {
-                backingList.remove(maxSize);
-            }
-            return added;
-        }
-
-        @Override
-        public int size() {
-            return backingList.size();
-        }
-
-        @Override
-        public int hashCode() {
-            return backingList.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return backingList.equals(obj);
-        }
-    }
-
-    private static class EntryMarketValueComparator implements Comparator<Entry> {
-        @Override
-        public int compare(Entry entry, Entry entry2) {
-            return entry.getMarketValue().compareTo(entry2.getMarketValue());
-        }
     }
 }

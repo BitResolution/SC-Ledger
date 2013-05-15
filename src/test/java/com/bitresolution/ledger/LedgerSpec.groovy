@@ -69,10 +69,10 @@ class LedgerSpec extends Specification {
         ledger.addReport(exampleDataSetA)
 
         when:
-        def result = ledger.summariseStock("COM", new DateTime("20120331"))
+        def result = ledger.summariseStock("COM")
 
         then:
-        assert result == 4349.0
+        assert result == [4349.0]
     }
 
     def "should list top 5 performers for a given date"() {
@@ -81,9 +81,10 @@ class LedgerSpec extends Specification {
         ledger.addReport(exampleDataSetA)
 
         when:
-        def result = ledger.findTopPerformersForDate(5, new DateTime("20120812"))
+        def result = ledger.findLargestPositions(5, new DateTime("20120812"))
 
         then:
+        assert result.size() == 5
         assert result*.nameOfIssuer == [
                 "ARCH CAP GROUP LTD",
                 "ARCTIC CAT INC",
@@ -100,7 +101,7 @@ class LedgerSpec extends Specification {
         ledger.addReport(exampleDataSetB)
 
         when:
-        def result = ledger.findTopNewPerformersForDate(3, new DateTime("20120812"))
+        def result = ledger.findTopNewPerformers(3, new DateTime("20120812"))
 
         then:
         assert result.size() == 3
@@ -108,8 +109,6 @@ class LedgerSpec extends Specification {
                 "ARCH CAP GROUP LTD",
                 "ARCTIC CAT INC",
                 "ALCOA INC",
-                "AGILENT TECHNOLOGIES INC",
-                "AARONS INC"
         ]
     }
 
