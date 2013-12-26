@@ -1,7 +1,7 @@
 SC-Ledger
 ==========
 
-A tool for processing flat file based stock data
+**ARCHIVED** - A tool for processing flat file based stock data
 
 Building The Application
 ------------------------
